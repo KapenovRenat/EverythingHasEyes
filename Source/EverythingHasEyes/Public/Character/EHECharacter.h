@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Actors/PickUpActor.h"
 #include "Camera/CameraComponent.h"
+#include "Components/PointLightComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EHECharacter.generated.h"
@@ -23,6 +25,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
 	USpringArmComponent* SpringArmComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="IsLamp")
+	bool isLampOn = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Meshes")
+	UStaticMeshComponent* LampStaticMeshComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Light")
+	UPointLightComponent* LampPointLightComponent;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim")
+	UAnimMontage* AnimMontagePickUp;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Items")
+	TArray<APickUpActor*> Items;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -36,4 +53,8 @@ public:
 
 	void MoveForward(float Value);
 	void MoveRight(float Value);
+	void ToggleLamp();
+	void PickUp();
+	void SetItem(APickUpActor* Item);
+	void ShowItems();
 };

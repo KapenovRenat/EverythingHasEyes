@@ -3,6 +3,10 @@
 
 #include "EverythingHasEyes/Public/Character/EHECharacter.h"
 
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
+
 // Sets default values
 AEHECharacter::AEHECharacter()
 {
@@ -14,14 +18,23 @@ AEHECharacter::AEHECharacter()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("Camera");
 	SpringArmComponent->SetupAttachment(GetRootComponent());
 	CameraComponent->SetupAttachment(SpringArmComponent);
-	
+	LampStaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("LampComponent");
+	LampStaticMeshComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, "lampSocket");
+	LampPointLightComponent = CreateDefaultSubobject<UPointLightComponent>("LampLight");
+	LampPointLightComponent->SetupAttachment(LampStaticMeshComponent);
 }
 
 // Called when the game starts or when spawned
 void AEHECharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if (GetCharacterMovement() != nullptr && LampStaticMeshComponent != nullptr && LampPointLightComponent != nullptr)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+		LampStaticMeshComponent->SetVisibility(false);
+		LampPointLightComponent->SetVisibility(false);
+	}
 }
 
 // Called every frame
@@ -42,6 +55,8 @@ void AEHECharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis("Look Up / Down Mouse", this, &AEHECharacter::AddControllerPitchInput);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AEHECharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AEHECharacter::StopJumping);
+	PlayerInputComponent->BindAction("ShowLamp", IE_Pressed, this, &AEHECharacter::ToggleLamp);
+	PlayerInputComponent->BindAction("Test", IE_Pressed, this, &AEHECharacter::ShowItems);
 }
 
 void AEHECharacter::MoveForward(float Value)
@@ -68,3 +83,48 @@ void AEHECharacter::MoveRight(float Value)
 	}
 }
 
+void AEHECharacter::ToggleLamp()
+{
+	if (isLampOn)
+	{
+		isLampOn = false;
+		GetCapsuleComponent()->SetCapsuleRadius(34);
+		LampStaticMeshComponent->SetVisibility(false);
+		LampPointLightComponent->SetVisibility(false);
+	} else
+	{
+		isLampOn = true;
+		GetCapsuleComponent()->SetCapsuleRadius(75);
+		LampStaticMeshComponent->SetVisibility(true);
+		LampPointLightComponent->SetVisibility(true);
+	}
+}
+
+void AEHECharacter::PickUp()
+{
+	if (AnimMontagePickUp)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Montage"));
+		PlayAnimMontage(AnimMontagePickUp, 1.5, NAME_None);
+	}
+}
+
+void AEHECharacter::SetItem(APickUpActor* Item)
+{
+	if (Item)
+	{
+		Items.Add(Item);
+		PickUp();
+	}
+}
+
+void AEHECharacter::ShowItems()
+{
+	if (!Items.IsEmpty())
+	{
+		for (const APickUpActor* Item : Items)
+		{
+			UKismetSystemLibrary::PrintString(GetWorld(), Item->PickUp.Name, true, false, FLinearColor::Red, 1.0f);
+		}
+	}
+}
