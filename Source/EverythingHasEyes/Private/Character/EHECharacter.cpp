@@ -86,18 +86,32 @@ void AEHECharacter::MoveRight(float Value)
 
 void AEHECharacter::ToggleLamp()
 {
-	if (isLampOn)
+	
+	UInventaryComponent* InventaryComponent = Cast<UInventaryComponent>(GetComponentByClass(UInventaryComponent::StaticClass()));
+
+	if (InventaryComponent)
 	{
-		isLampOn = false;
-		GetCapsuleComponent()->SetCapsuleRadius(34);
-		LampStaticMeshComponent->SetVisibility(false);
-		LampPointLightComponent->SetVisibility(false);
-	} else
-	{
-		isLampOn = true;
-		GetCapsuleComponent()->SetCapsuleRadius(75);
-		LampStaticMeshComponent->SetVisibility(true);
-		LampPointLightComponent->SetVisibility(true);
+		TArray<APickUpActor*> InventaryItems = InventaryComponent->Items;
+		int32 Index = InventaryItems.IndexOfByPredicate([](APickUpActor* FindItem){
+			return FindItem->PickUp.Names == ETypeNames::NeonLamp;
+		});
+		
+		if (Index >= 0 && InventaryItems[Index]->PickUp.Count > 0)
+		{
+			if (isLampOn)
+			{
+				isLampOn = false;
+				GetCapsuleComponent()->SetCapsuleRadius(34);
+				LampStaticMeshComponent->SetVisibility(false);
+				LampPointLightComponent->SetVisibility(false);
+			} else
+			{
+				isLampOn = true;
+				GetCapsuleComponent()->SetCapsuleRadius(75);
+				LampStaticMeshComponent->SetVisibility(true);
+				LampPointLightComponent->SetVisibility(true);
+			}
+		}
 	}
 }
 
