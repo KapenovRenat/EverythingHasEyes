@@ -54,7 +54,7 @@ void APickUpActor::FunctionGetItem()
 		{
 			Character->PickUp();
 			InventaryComponent->SetItem(this);
-			UKismetSystemLibrary::PrintString(GetWorld(), InventaryComponent->GetName(), true, false, FLinearColor::Red, 1.0f);
+			// UKismetSystemLibrary::PrintString(GetWorld(), InventaryComponent->GetName(), true, false, FLinearColor::Red, 1.0f);
 			Destroy();
 		}
 	}

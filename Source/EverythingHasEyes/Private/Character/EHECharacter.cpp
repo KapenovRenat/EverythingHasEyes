@@ -118,7 +118,7 @@ void AEHECharacter::ShowItems()
 	{
 		for (APickUpActor* Item : InventaryComponent->Items)
 		{
-			UKismetSystemLibrary::PrintString(GetWorld(), Item->GetName(), true, false, FLinearColor::Red, 1.0f);
+			UKismetSystemLibrary::PrintString(GetWorld(), FString::FromInt(Item->PickUp.Count), true, false, FLinearColor::Red, 1.0f);
 		}
 	}
 }
