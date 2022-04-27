@@ -36,9 +36,6 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim")
 	UAnimMontage* AnimMontagePickUp;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Items")
-	TArray<APickUpActor*> Items;
 
 protected:
 	// Called when the game starts or when spawned
@@ -55,6 +52,5 @@ public:
 	void MoveRight(float Value);
 	void ToggleLamp();
 	void PickUp();
-	void SetItem(APickUpActor* Item);
 	void ShowItems();
 };

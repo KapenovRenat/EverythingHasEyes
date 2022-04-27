@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/BoxComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/Actor.h"
+#include "Widgets/PlayerWidget.h"
 #include "PickUpActor.generated.h"
 
 UENUM(BlueprintType)
@@ -14,13 +16,22 @@ enum class EType : uint8
 	objects      UMETA(DisplayName = "Objects"),
 };
 
+UENUM(BlueprintType)
+enum class ETypeNames : uint8
+{
+	NeonLamp     UMETA(DisplayName = "NeonLamp")
+};
+
 USTRUCT(BlueprintType)
 struct FPickUpStruct
 {
 	GENERATED_BODY()
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Name")
-	FString Name;
+	ETypeNames Names;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Count")
+	int32 Count = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Type")
 	EType Type;
@@ -43,10 +54,10 @@ public:
 	UBoxComponent* BoxComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Options")
-	FPickUpStruct PickUp;
+	class UWidgetComponent* WidgetComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Variables")
-	bool inTrigger;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Options")
+	FPickUpStruct PickUp;
 	
 protected:
 	// Called when the game starts or when spawned

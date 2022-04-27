@@ -4,6 +4,7 @@
 #include "EverythingHasEyes/Public/Character/EHECharacter.h"
 
 #include "Components/CapsuleComponent.h"
+#include "Components/InventaryComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -109,22 +110,15 @@ void AEHECharacter::PickUp()
 	}
 }
 
-void AEHECharacter::SetItem(APickUpActor* Item)
-{
-	if (Item)
-	{
-		Items.Add(Item);
-		PickUp();
-	}
-}
-
 void AEHECharacter::ShowItems()
 {
-	if (!Items.IsEmpty())
+	UInventaryComponent* InventaryComponent = Cast<UInventaryComponent>(GetComponentByClass(UInventaryComponent::StaticClass()));
+
+	if (InventaryComponent)
 	{
-		for (const APickUpActor* Item : Items)
+		for (APickUpActor* Item : InventaryComponent->Items)
 		{
-			UKismetSystemLibrary::PrintString(GetWorld(), Item->PickUp.Name, true, false, FLinearColor::Red, 1.0f);
+			UKismetSystemLibrary::PrintString(GetWorld(), Item->GetName(), true, false, FLinearColor::Red, 1.0f);
 		}
 	}
 }

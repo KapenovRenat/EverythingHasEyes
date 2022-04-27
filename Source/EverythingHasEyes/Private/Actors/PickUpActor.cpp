@@ -4,7 +4,9 @@
 #include "Actors/PickUpActor.h"
 
 #include "Character/EHECharacter.h"
+#include "Components/InventaryComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Widgets/PlayerWidget.h"
 
 // Sets default values
 APickUpActor::APickUpActor()
@@ -17,6 +19,9 @@ APickUpActor::APickUpActor()
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
 	Mesh->SetupAttachment(GetRootComponent());
 	BoxComponent->SetupAttachment(GetRootComponent());
+	WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
+	WidgetComponent->SetupAttachment(GetRootComponent());
+	WidgetComponent->SetVisibility(false);
 	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &APickUpActor::OnBeginOverlap);
 	BoxComponent->OnComponentEndOverlap.AddDynamic(this, &APickUpActor::OnEndOverlap);
 }
@@ -40,12 +45,18 @@ void APickUpActor::SetupMyPlayerInputComponent(UInputComponent* InputMyComponent
 
 void APickUpActor::FunctionGetItem()
 {
-	UKismetSystemLibrary::PrintString(GetWorld(), "Interact", true, false, FLinearColor::Red, 1.0f);
 	AEHECharacter* Character = Cast<AEHECharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	
 	if (Character)
 	{
-		Character->SetItem(this);
-		Destroy();
+		UInventaryComponent* InventaryComponent = Cast<UInventaryComponent>(Character->GetComponentByClass(UInventaryComponent::StaticClass()));
+		if (InventaryComponent)
+		{
+			Character->PickUp();
+			InventaryComponent->SetItem(this);
+			UKismetSystemLibrary::PrintString(GetWorld(), InventaryComponent->GetName(), true, false, FLinearColor::Red, 1.0f);
+			Destroy();
+		}
 	}
 }
 
@@ -55,7 +66,7 @@ void APickUpActor::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* O
 	UKismetSystemLibrary::PrintString(GetWorld(), "Entered", true, false, FLinearColor::Red, 1.0f);
 	if (OverlappedComp != nullptr && Other != nullptr && OtherComp != nullptr)
 	{
-		inTrigger = true;
+		WidgetComponent->SetVisibility(true);
 		EnableInput(GetWorld()->GetFirstPlayerController());
 		UInputComponent* MyInputComponent = this->InputComponent;
 		if (MyInputComponent) SetupMyPlayerInputComponent(MyInputComponent);
@@ -68,7 +79,7 @@ void APickUpActor::OnEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	UKismetSystemLibrary::PrintString(GetWorld(), "Exited", true, false, FLinearColor::Red, 1.0f);
 	if (OverlappedComp != nullptr && Other != nullptr && OtherComp != nullptr)
 	{
-		inTrigger = false;
+		WidgetComponent->SetVisibility(false);
 		DisableInput(GetWorld()->GetFirstPlayerController());
 	}
 }

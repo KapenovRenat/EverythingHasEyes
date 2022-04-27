@@ -13,5 +13,4 @@ UCLASS()
 class EVERYTHINGHASEYES_API UPlayerWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
 };
