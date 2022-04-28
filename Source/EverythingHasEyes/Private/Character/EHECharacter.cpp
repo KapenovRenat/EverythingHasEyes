@@ -58,6 +58,8 @@ void AEHECharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AEHECharacter::StopJumping);
 	PlayerInputComponent->BindAction("ShowLamp", IE_Pressed, this, &AEHECharacter::ToggleLamp);
 	PlayerInputComponent->BindAction("Test", IE_Pressed, this, &AEHECharacter::ShowItems);
+	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &AEHECharacter::OnRun);
+	PlayerInputComponent->BindAction("Run", IE_Released, this, &AEHECharacter::OffRun);
 }
 
 void AEHECharacter::MoveForward(float Value)
@@ -134,5 +136,57 @@ void AEHECharacter::ShowItems()
 		{
 			UKismetSystemLibrary::PrintString(GetWorld(), FString::FromInt(Item->PickUp.Count), true, false, FLinearColor::Red, 1.0f);
 		}
+	}
+}
+
+void AEHECharacter::OnRun()
+{
+	if (GetCharacterMovement() != nullptr)
+	{
+		if (Stamina != 0)
+		{
+			GetWorldTimerManager().ClearTimer(StaminaHandleRecovery);
+			GetWorldTimerManager().SetTimer(StaminaHandleCompletion, this, &AEHECharacter::StaminaCompletion, 1.0f, true, 1.0f);
+			GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+		}
+	}
+}
+
+void AEHECharacter::OffRun()
+{
+	if (GetCharacterMovement() != nullptr)
+	{
+		GetWorldTimerManager().ClearTimer(StaminaHandleCompletion);
+		GetWorldTimerManager().SetTimer(StaminaHandleRecovery, this, &AEHECharacter::StaminaRecovery, 1.0f, true, 1.0f);
+		GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+	}
+}
+
+void AEHECharacter::StaminaCompletion()
+{
+	UKismetSystemLibrary::PrintString(GetWorld(), FString::SanitizeFloat(Stamina) + " Stamina", true, false, FLinearColor::Red, 1.0f);
+	if (Stamina != 0)
+	{
+		Stamina -= 10.0f;
+	} else
+	{
+		if (GetCharacterMovement() != nullptr)
+		{
+			GetWorldTimerManager().ClearTimer(StaminaHandleCompletion);
+			GetWorldTimerManager().SetTimer(StaminaHandleRecovery, this, &AEHECharacter::StaminaRecovery, 1.0f, true, 1.0f);
+			GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+		}
+	}
+}
+
+void AEHECharacter::StaminaRecovery()
+{
+	UKismetSystemLibrary::PrintString(GetWorld(), FString::SanitizeFloat(Stamina) + " Stamina", true, false, FLinearColor::Red, 1.0f);
+	if (Stamina != 100)
+	{
+		Stamina += 10.0f;
+	} else
+	{
+		GetWorldTimerManager().ClearTimer(StaminaHandleRecovery);
 	}
 }

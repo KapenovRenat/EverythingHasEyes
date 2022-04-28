@@ -37,6 +37,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim")
 	UAnimMontage* AnimMontagePickUp;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stamina")
+	float Stamina = 100.0f;
+
+	FTimerHandle StaminaHandleCompletion;
+	FTimerHandle StaminaHandleRecovery;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -53,4 +59,8 @@ public:
 	void ToggleLamp();
 	void PickUp();
 	void ShowItems();
+	void OnRun();
+	void OffRun();
+	void StaminaCompletion();
+	void StaminaRecovery();
 };
