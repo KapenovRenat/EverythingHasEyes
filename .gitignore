@@ -3,8 +3,16 @@
 /Binaries/Win64/
 /.idea/.idea.EverythingHasEyes/.idea/
 /Intermediate/
-/Content/
 /Plugins/Developer/RiderLink/
 /Saved/
 /EverythingHasEyes.sln
 /EverythingHasEyes.uproject
+/Content/Characters/
+/Content/LevelPrototyping/
+/Content/LightProfilePack/
+/Content/Megascans/
+/Content/MetaHumans/
+/Content/MSPresets/
+/Content/MyContent/
+/Content/ThirdPerson/
+/Content/ThirdPerson/Maps/
