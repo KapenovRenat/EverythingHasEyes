@@ -40,6 +40,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stamina")
 	float Stamina = 100.0f;
 
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UPlayerHUD> PlayerHudClass;
+	
+	UPROPERTY()
+	UPlayerHUD* PlayerHud;
+	
 	FTimerHandle StaminaHandleCompletion;
 	FTimerHandle StaminaHandleRecovery;
 

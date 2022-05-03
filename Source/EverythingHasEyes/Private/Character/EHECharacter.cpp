@@ -7,6 +7,7 @@
 #include "Components/InventaryComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Widgets/PlayerHUD.h"
 
 // Sets default values
 AEHECharacter::AEHECharacter()
@@ -23,6 +24,9 @@ AEHECharacter::AEHECharacter()
 	LampStaticMeshComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, "lampSocket");
 	LampPointLightComponent = CreateDefaultSubobject<UPointLightComponent>("LampLight");
 	LampPointLightComponent->SetupAttachment(LampStaticMeshComponent);
+
+	PlayerHudClass = nullptr;
+	PlayerHud = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -35,6 +39,15 @@ void AEHECharacter::BeginPlay()
 		GetCharacterMovement()->MaxWalkSpeed = 300.0f;
 		LampStaticMeshComponent->SetVisibility(false);
 		LampPointLightComponent->SetVisibility(false);
+	}
+
+	if (IsLocallyControlled() && PlayerHudClass)
+	{
+		APlayerController* FPC = GetController<APlayerController>();
+		PlayerHud = CreateWidget<UPlayerHUD>(FPC, PlayerHudClass);
+		check(PlayerHud);
+		PlayerHud->SetStamina(Stamina, 100.0f);
+		PlayerHud->AddToPlayerScreen();
 	}
 }
 
@@ -168,6 +181,7 @@ void AEHECharacter::StaminaCompletion()
 	if (Stamina != 0)
 	{
 		Stamina -= 10.0f;
+		PlayerHud->SetStamina(Stamina, 100.0f);
 	} else
 	{
 		if (GetCharacterMovement() != nullptr)
@@ -185,6 +199,7 @@ void AEHECharacter::StaminaRecovery()
 	if (Stamina != 100)
 	{
 		Stamina += 10.0f;
+		PlayerHud->SetStamina(Stamina, 100.0f);
 	} else
 	{
 		GetWorldTimerManager().ClearTimer(StaminaHandleRecovery);
